@@ -1,0 +1,46 @@
+[project]
+name = "stockforge-ai"
+version = "0.1.0.dev1"
+description = "Open-source, remote-first digital asset production automation platform"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "typer>=0.16,<1.0",
+  "pillow>=11.0,<13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<9.0",
+]
+image = [
+  "pillow>=11.0,<13.0",
+]
+web = [
+  "fastapi>=0.115,<1.0",
+  "uvicorn>=0.30,<1.0",
+  "python-multipart>=0.0.9,<1.0",
+  "httpx2>=2.0,<3.0",
+]
+upscale = [
+  "realesrgan==0.3.0",
+  "basicsr==1.4.2",
+  "opencv-python-headless>=4.8,<5.0",
+  "numpy>=1.24,<3.0",
+]
+
+[project.scripts]
+stockforge = "stockforge.cli:app"
+stockforge-web = "stockforge.web_runner:main"
+stockforge-web-worker = "stockforge.web_worker:main"
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/stockforge"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

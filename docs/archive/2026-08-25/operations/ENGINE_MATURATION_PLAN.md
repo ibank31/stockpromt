@@ -1,0 +1,58 @@
+# StockForge Engine Maturation Plan
+
+**Updated:** 2026-08-24
+**Branch:** `main`
+**Policy:** No generation unless a deterministic validation gap makes a trial necessary.
+
+## Goal
+
+Make StockForge usable as a product-type selector and controlled asset factory. The user selects an asset type; StockForge chooses the buyer job, niche, prompt, format, provider, quality gates, metadata draft, and delivery path. The user receives only a review visual and, after explicit approval, an upload copy. Marketplace-only fields remain manual.
+
+## Milestones
+
+| Stage | Scope | Generation allowed? | Exit evidence |
+|---|---|---:|---|
+| 0 | Baseline and checkpoint | No | Clean `main`, tests pass, current docs read |
+| 1 | Asset-type selector and format route | No | `portfolio asset-types` and `portfolio readiness` map each supported type to one explicit route and blocker set |
+| 2 | Prompt and policy compiler | No | Rights-safe prompt, negative prompt, metadata draft, and pre-GPU blockers are test-covered |
+| 3 | Format builders and technical gates | No | JPEG/SVG/PNG/pattern contracts pass local tests; blocked formats remain blocked until their gates exist |
+| 4 | Output and learning loop | No | HP folders, upload-copy metadata, append-only evaluation ledger, and summary are test-covered |
+| 5 | Trial readiness review | No | `portfolio trial-readiness` requires a concrete hypothesis and purpose, then returns `READY_FOR_TRIAL`, `REVIEW_REQUIRED`, or `BLOCKED` without provider calls |
+| 6 | One controlled trial per approved format | Yes, one at a time | Preview, finalization, human review, metadata review, and evaluation record exist |
+| 7 | Learning and regression update | No | Trial findings are documented; changes are tested before another trial |
+
+## Format release gates
+
+### JPEG raster scene
+
+A trial is allowed only after the selected brief passes buyer-job, prompt/IP, layout, provider/quota, and duplicate-risk preflight. The output must be reviewed at full size, finalized to RGB/sRGB JPEG when needed, packaged with metadata draft, and recorded in the evaluation ledger.
+
+### Native SVG
+
+A trial is local and does not need GPU. The SVG must contain genuine editable geometry, no raster embed, script, external link, hidden object, or live font. The first trial should use a deterministic object/icon preset, not a raster trace or a complex scene.
+
+### PNG transparent asset
+
+A trial is not allowed until a real alpha producer exists. A white or checkerboard preview is not evidence of transparency. The path must include alpha assertion, anti-fringe review, excess-canvas trim, sRGB/decodability checks, and one manual portal validation plan.
+
+### Seamless pattern
+
+A trial is not allowed to claim seamlessness until the candidate passes horizontal and vertical edge continuity. The gate checks boundaries only; visual utility and marketplace suitability still require human review.
+
+## Learning contract
+
+Each future trial is a controlled experiment with one buyer hypothesis, one asset brief, one chosen format, one provider/model context, and a bounded output. After review, record visual quality, technical quality, buyer fit, metadata accuracy, decision, rejection reasons, and marketplace outcome in `evaluations/generation_evaluations.jsonl`.
+
+Evaluation summaries are descriptive. They cannot automatically change prompts, provider routing, format policy, or generation volume. A later engine change must cite the records that motivate it and must pass regression tests before another trial is considered.
+
+## Delivery contract
+
+A future generation preview may be copied to `Download/MACHINE STOCKFORGE/PREVIEW_TO_MANUS/`. Only an explicitly approved final upload copy may be copied to `Download/MACHINE STOCKFORGE/READY_UPLOAD_ADOBE/`. Embedded JPEG title/keywords are convenience metadata; category, GenAI declaration, release, CAPTCHA, Terms, and submit remain manual.
+
+## Current state
+
+Stage 1 is complete. The selector, readiness report, and `portfolio plan-type` entry point are implemented and tested without generation. Supported types now include `scene`, `native_object`, `icon_set`, `technical_icon`, `seamless_pattern`, and `transparent_cutout`. Native SVG has deterministic native-only routes and remains frozen as a future plan after the documented value review; PNG has a conservative true-alpha normalizer that refuses opaque sources, but the production route remains explicitly blocked. Unsupported asset types fail closed. The JPEG route has conditional scene prompt safety, a non-upload metadata preflight across supported platforms, and a nine-lane identity registry with persisted signature, lighting, framing, context, distinctness, and prohibited-shorthand fields. Target-runtime Real-ESRGAN and provider-backed semantic QA remain unproven.
+
+## Current next action
+
+Continue JPEG maturation without generation: use the nine-lane identity profiles to select one researched buyer hypothesis, strengthen scene/release/composition gates, and keep provider and finalizer prerequisites explicit. Run `portfolio metadata-preflight` on a reviewed JPEG brief before any future upload; it reorders only existing visual terms, reports platform constraints, and never guesses categories or uploads. Next, test identity distinctiveness and complete a lane-specific pretrial specification; benchmark Real-ESRGAN exactly once in the configured target runtime and add provider-backed semantic/commercial QA only when a real vision-capable provider is available. The rejected modular-ribbon and reviewed file-flow SVG evidence remain archived, but no SVG expansion or trial is active. PNG remains blocked until a real alpha-capable producer, anti-fringe/trim policy, and portal evidence exist.
