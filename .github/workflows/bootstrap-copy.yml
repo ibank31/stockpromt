@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Copy StockForge AI source tree
+      - name: Copy StockForge AI source tree except workflow files
         shell: bash
         run: |
           set -euo pipefail
@@ -30,6 +30,7 @@ jobs:
           git clone --depth=1 https://github.com/ibank31/stockforge-ai.git "$tmp_dir/source"
           rsync -a --delete \
             --exclude='.git/' \
+            --exclude='.github/workflows/' \
             --exclude='.github/workflows/bootstrap-copy.yml' \
             "$tmp_dir/source/" ./
           rm -rf "$tmp_dir"
