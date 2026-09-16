@@ -1,0 +1,39 @@
+name: Prompt Studio CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'prompt-studio/**'
+      - '.github/workflows/prompt-studio-ci.yml'
+  pull_request:
+    paths:
+      - 'prompt-studio/**'
+      - '.github/workflows/prompt-studio-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Verify prompt studio files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f prompt-studio/index.html
+          test -f prompt-studio/app.js
+          test -f prompt-studio/styles.css
+          test -f prompt-studio/functions/api/prompt.js
+          test -f prompt-studio/lib/prompt-policy.mjs
+          test -f prompt-studio/_routes.json
+      - name: Node syntax checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check prompt-studio/app.js
+          node --check prompt-studio/functions/api/prompt.js
+          node --check prompt-studio/lib/prompt-policy.mjs
+      - name: Prompt policy tests
+        run: node --test prompt-studio/tests/prompt-policy.test.mjs
