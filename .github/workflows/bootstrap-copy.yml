@@ -1,0 +1,42 @@
+name: Bootstrap StockPromt from StockForge AI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  copy-source:
+    if: ${{ !contains(github.event.head_commit.message || '', '[stockpromt-bootstrap-complete]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Copy StockForge AI source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp_dir="$(mktemp -d)"
+          git clone --depth=1 https://github.com/ibank31/stockforge-ai.git "$tmp_dir/source"
+          cp -a "$tmp_dir/source/." .
+          rm -rf "$tmp_dir"
+
+      - name: Commit copied source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: copy StockForge AI baseline [stockpromt-bootstrap-complete]"
+          git push origin HEAD:main
