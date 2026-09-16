@@ -1,0 +1,1 @@
+export function onRequestGet(){return new Response(JSON.stringify({ok:true,service:"stockpromt-prompt-studio",stage:"prompt-compiler",generation:"external-apk",upscale:"optional-external"}),{headers:{"content-type":"application/json","cache-control":"no-store"}})}
