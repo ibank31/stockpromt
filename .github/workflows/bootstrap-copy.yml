@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_REPOSITORY: ${{ github.repository }}
+
 jobs:
   copy-source:
     if: ${{ !contains(github.event.head_commit.message || '', '[stockpromt-bootstrap-complete]') }}
@@ -24,7 +28,10 @@ jobs:
           set -euo pipefail
           tmp_dir="$(mktemp -d)"
           git clone --depth=1 https://github.com/ibank31/stockforge-ai.git "$tmp_dir/source"
-          cp -a "$tmp_dir/source/." .
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/bootstrap-copy.yml' \
+            "$tmp_dir/source/" ./
           rm -rf "$tmp_dir"
 
       - name: Commit copied source
