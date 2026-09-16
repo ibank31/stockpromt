@@ -39,4 +39,5 @@ jobs:
             exit 0
           fi
           git commit -m "chore: copy StockForge AI baseline [stockpromt-bootstrap-complete]"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push origin HEAD:main
