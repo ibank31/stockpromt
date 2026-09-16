@@ -1,51 +1,16 @@
 name: Bootstrap StockPromt from StockForge AI
 
+# Historical bootstrap helper. Deliberately manual-only so the new StockPromt
+# project cannot overwrite its own work on every push.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GITHUB_REPOSITORY: ${{ github.repository }}
-
 jobs:
   copy-source:
-    if: ${{ !contains(github.event.head_commit.message || '', '[stockpromt-bootstrap-complete]') }}
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout target repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Copy StockForge AI source tree except workflow files
-        shell: bash
-        run: |
-          set -euo pipefail
-          tmp_dir="$(mktemp -d)"
-          git clone --depth=1 https://github.com/ibank31/stockforge-ai.git "$tmp_dir/source"
-          rsync -a --delete \
-            --exclude='.git/' \
-            --exclude='.github/workflows/' \
-            --exclude='.github/workflows/bootstrap-copy.yml' \
-            "$tmp_dir/source/" ./
-          rm -rf "$tmp_dir"
-
-      - name: Commit copied source
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No source changes to commit"
-            exit 0
-          fi
-          git commit -m "chore: copy StockForge AI baseline [stockpromt-bootstrap-complete]"
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push origin HEAD:main
+      - run: echo "Historical bootstrap disabled for the standalone StockPromt project"
