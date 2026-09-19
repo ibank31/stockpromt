@@ -1,0 +1,14 @@
+export const REFERENCE_FORENSICS_CONTRACT = `REFERENCE FORENSICS PROTOCOL\n\nTreat the uploaded image as a reference-analysis task, not as a prompt to imitate the entire screenshot. Perform the following in order:\n1. Locate the primary reusable asset inside the image. If the image is a marketplace email, dashboard, screenshot, or social post, separate the embedded artwork from headers, buttons, prices, logos, watermarks, UI, and other interface contamination.\n2. Describe the asset DNA independently from the market/buyer intent. Asset DNA must cover: subject category, medium, rendering method, geometry, line quality, palette, shading, texture, perspective, silhouette, edge treatment, level of detail, and overall visual language.\n3. Describe the market DNA independently: commercial message, buyer industries, use cases, emotional tone, layout utility, copy-space behavior, and likely evergreen value.\n4. Explicitly state what must NOT be transferred from the reference: literal subject, exact silhouette, exact composition, recognizable marks, text, prices, logos, UI, or screenshot framing.\n5. When the reference contains a small illustrated house or another concrete object but the operator asks for a different concept, transfer only the validated visual language (for example flat vector/illustration characteristics, palette logic, outline behavior, and shading approach), never the object itself.\n6. Distinguish observed facts from uncertain inferences. Never claim that a screenshot's surrounding text, price, badge, or brand is part of the reusable artwork.\n7. The final production prompt must contain a clearly named STYLE TRANSFER CONSTRAINTS section and a clearly named SUBJECT SEPARATION section. It must specify the requested subject as the dominant visual content and forbid the reference's literal subject when the operator excludes it.\n8. Do not turn a style description into an artist imitation or name a living artist, brand, platform, or copyrighted style. Use generic technical descriptors instead.\n9. If the reference is a raster illustration, do not silently convert it into photorealistic CGI, glossy 3D, cinematic lighting, or a different medium unless the operator explicitly requests that transformation.\n10. Preserve the requested aspect ratio and generous copy space. Do not add decorative objects merely because they appear in the reference screenshot.`;
+
+export const REFERENCE_FORENSICS_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    asset_boundary: { type: "STRING" },
+    asset_dna: { type: "STRING" },
+    market_dna: { type: "STRING" },
+    contamination: { type: "ARRAY", items: { type: "STRING" } },
+    transfer_constraints: { type: "ARRAY", items: { type: "STRING" } },
+    confidence: { type: "STRING" },
+  },
+  required: ["asset_boundary", "asset_dna", "market_dna", "contamination", "transfer_constraints", "confidence"],
+};
