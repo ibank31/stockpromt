@@ -40,9 +40,9 @@
         </div>
         <div class="form-stack">
           <label>Asset type<select id="assetType"><option>Photo</option><option>Illustration</option><option>Vector concept</option><option>Any suitable stock type</option></select></label>
-          <label>Preferred framing<select id="aspect"><option>Choose commercially useful framing</option><option>Square 1:1</option><option>Landscape 4:3</option><option>Landscape 3:2</option><option>Wide 16:9</option><option>Portrait 2:3</option></select></label>
+          <label>Preferred framing <span class="field-help">auto-selects when left broad</span><select id="aspect"><option>Choose commercially useful framing</option><option>Square 1:1</option><option>Landscape 4:3</option><option>Landscape 3:2</option><option>Wide 16:9</option><option>Portrait 2:3</option></select></label>
           <label>Prompt model<select id="promptProvider"><option value="auto">Auto · free-first</option><option value="workers-ai">Workers AI · free-first</option><option value="gemini">Gemini · optional key</option></select></label>
-          <label>Operator notes<textarea id="notes" rows="5" maxlength="2000" placeholder="Buyer, niche, copy-space need, materials, mood, or elements to avoid..."></textarea></label>
+          <label>Operator notes <span class="field-help">optional · smart analysis fills the gaps</span><textarea id="notes" rows="5" maxlength="2000" placeholder="Leave blank for automatic buyer, niche, composition, and policy analysis. Add notes only for a specific preference..."></textarea></label>
           <button id="run" class="primary" disabled>Analyze reference <span>→</span></button>
         </div>
       </div>
