@@ -99,14 +99,14 @@ async function analyze() {
   $('#run').disabled = true; setStatus('ANALYZING', true);
   try {
     const image = await dataUrl(await prepareImage(state.referenceFile));
-    const response = await fetch('./api/prompt', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ image, asset_type: $('#assetType').value, preferred_aspect: $('#aspect').value, notes: $('#notes').value }) });
+    const response = await fetch('./api/prompt', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ image, asset_type: $('#assetType').value, preferred_aspect: $('#aspect').value, provider: $('#promptProvider').value, notes: $('#notes').value }) });
     const payload = await response.json();
     if (!response.ok || !payload.ok) throw new Error(payload.error || 'Prompt analysis failed');
     state.analysis = payload.result;
     $('#referenceSummary').textContent = payload.result.reference_summary;
     $('#commercialIntent').textContent = payload.result.commercial_intent;
     $('#policyNotes').replaceChildren(...payload.result.policy_notes.map((note) => { const li = document.createElement('li'); li.textContent = note; return li; }));
-    $('#modelBadge').textContent = `${payload.result.opportunities.length} OPTIONS · ${payload.model}`;
+    $('#modelBadge').textContent = `${payload.result.opportunities.length} OPTIONS · ${payload.provider || 'model'} · ${payload.model || 'auto'}`;
     $('#cards').replaceChildren(...payload.result.opportunities.map(makeCard));
     setStatus('PROMPTS READY'); go('prompt');
   } catch (error) { setStatus('ERROR'); alert(error instanceof Error ? error.message : String(error)); }

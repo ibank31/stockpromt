@@ -28,30 +28,36 @@ Human review / ready upload
 
 This project intentionally does not generate images. The image generator remains an external APK or browser tool chosen by the operator. It also does not submit to Adobe Stock automatically. The browser workspace keeps the selected prompt, manually uploaded result, upscale provenance, metadata, and final download state together in one workflow.
 
+## Why the old error appeared
+
+`/api/prompt` is a **Cloudflare Pages Function**, not a static browser file. The site must be deployed to the Cloudflare Pages project `stockpromt-studio`; GitHub Pages can serve the UI but cannot execute `functions/api/prompt.js` or provide its bindings. When the Function was reached without its secret, it returned `GEMINI_API_KEY is not configured`.
+
 ## Prompt contract
 
 Every concept must contain a concrete subject treatment, composition, viewpoint, environment, lighting, materials/texture where relevant, color strategy, buyer use case, copy-space guidance, aspect ratio guidance, and practical failure-prevention terms.
 
 The compiler must return exactly five materially different concepts. It must not reduce variation to crop/flip/recolor/filter tweaks.
 
-## Microstock policy guardrails
+## Free-first provider architecture
 
-The prompt compiler avoids artist names, real people, fictional characters, copyrighted creative works, government agencies, third-party IP, and descriptions implying actual newsworthy events. It also avoids copy/trace/match instructions and accidental typography, watermarks, branding, and UI artifacts.
+The default provider is Cloudflare Workers AI through the Pages `AI` binding, using `@cf/meta/llama-3.2-11b-vision-instruct`. This route is server-side, requires no Gemini key in the browser, and is selected by `auto` or `workers-ai`.
 
-The validator is only a deterministic guardrail. It is not legal clearance or a substitute for human review.
+Gemini 2.5 Flash remains an optional higher-quality route. Set `GEMINI_API_KEY` as a **Cloudflare Pages secret**, never in frontend code, and select `Gemini` or leave provider on `auto` to use Gemini after a Workers AI failure. The endpoint validates every provider response locally before returning it to the UI.
 
-## Free-first architecture
+## Environment and deployment
 
-Prompt compiler: Cloudflare Pages + Pages Functions + Gemini 2.5 Flash. Keep the Gemini key in the Pages Function secret, never in browser code.
-
-Upscaler: dedicated Hugging Face ZeroGPU Space using a real super-resolution model. Use an owned Space so model/provider identity, output dimensions, and failures can be logged honestly. A public demo can be used for experiments, but should not be treated as a production dependency.
-
-## Environment
+Cloudflare Pages project settings:
 
 ```text
-GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-2.5-flash
-UPSCALER_API_URL=https://<your-owned-upscaler-endpoint>
+AI                  Workers AI binding
+GEMINI_API_KEY      optional secret
+GEMINI_MODEL        optional variable, default gemini-2.5-flash
+WORKERS_AI_MODEL    optional variable, default @cf/meta/llama-3.2-11b-vision-instruct
+UPSCALER_API_URL    optional while the prompt-only stage is being tested
 ```
 
-`UPSCALER_API_URL` is optional while the prompt-only stage is being tested.
+The deployment must preserve the `prompt-studio/functions/` directory as Pages Functions. Do not publish this directory through GitHub Pages and expect `/api/prompt` to work.
+
+## Human-review boundaries
+
+The prompt compiler is a deterministic policy guardrail plus a model-assisted drafting tool. It is not legal clearance or a substitute for human review. Image generation, marketplace submission, similarity review, and metadata approval remain explicit operator actions.

@@ -1,7 +1,116 @@
 import { MICROSTOCK_SCHEMA, validateBundle } from "../../lib/prompt-policy.mjs";
-const DEFAULT_MODEL="gemini-2.5-flash";const MAX_IMAGE_BYTES=12*1024*1024;
-const POLICY=/\b(?:in the style of|inspired by|influenced by|after the style of|in the tradition of|celebrity|famous person|famous character|government agency|breaking news|news event|actual news)\b/i;
-const INSTRUCTION=`You are a commercial microstock art director and prompt compiler. Analyze the uploaded reference only to understand commercially useful intent. Do not copy, trace, recreate, match, or closely reproduce the reference. Preserve the buyer need while changing creative expression. Return exactly five materially different concepts. Variation must be conceptual, not a crop, flip, recolor, filter, or tiny composition adjustment. Change multiple dimensions such as subject treatment, environment, viewpoint, composition, lighting, color strategy, styling, negative space, narrative, or buyer use case. Write each master prompt in clear professional English for a generic modern text-to-image model. Include subject, state/action, environment, composition, viewpoint, lighting, materials/texture where relevant, color strategy, depth/focus when relevant, commercial use, copy space when useful, and clean-output constraints. Do not name artists, real people, celebrities, fictional characters, brands, trademarks, logos, proprietary products, government agencies, copyrighted works, or actual newsworthy events. Do not ask for exact replicas or reference matching. Avoid embedded text, signatures, watermarks, UI elements, badges, labels, and accidental typography. Do not invent unseen factual details; use generic descriptions when uncertain. Use photographic language only for photo concepts. Negative prompts should target likely failure modes for that concept.`;
-function out(status,payload){return new Response(JSON.stringify(payload),{status,headers:{"content-type":"application/json;charset=utf-8","cache-control":"no-store"}})}
-function imagePart(value){if(typeof value!=="string")throw new Error("image is required");const m=value.match(/^data:(image\/(?:jpeg|jpg|png|webp));base64,(.+)$/s);if(!m)throw new Error("image must be a JPEG, PNG, or WebP data URL");const data=m[2].replace(/\s+/g,"");const bytes=Math.floor(data.length*3/4);if(bytes>MAX_IMAGE_BYTES)throw new Error("analysis image exceeds 12 MB");return{mime_type:m[1]==="image/jpg"?"image/jpeg":m[1],data};}
-export async function onRequestPost({request,env}){try{if(!env.GEMINI_API_KEY)return out(503,{ok:false,error:"GEMINI_API_KEY is not configured"});const body=await request.json();const image=imagePart(body?.image);const model=String(env.GEMINI_MODEL||DEFAULT_MODEL);const assetType=String(body?.asset_type||"Any suitable stock type").slice(0,80);const aspect=String(body?.preferred_aspect||"Choose commercially useful framing").slice(0,80);const notes=String(body?.notes||"").slice(0,2000);const prompt=`${INSTRUCTION}\nRequested asset type: ${assetType}\nPreferred framing: ${aspect}\nOperator notes: ${notes||"None"}\nReturn only JSON matching the supplied schema.`;const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{method:"POST",headers:{"content-type":"application/json","x-goog-api-key":env.GEMINI_API_KEY},body:JSON.stringify({contents:[{role:"user",parts:[{inline_data:image},{text:prompt}]}],generationConfig:{temperature:.72,maxOutputTokens:9000,responseMimeType:"application/json",responseSchema:MICROSTOCK_SCHEMA}})});const data=await r.json();if(!r.ok)return out(502,{ok:false,error:"Gemini request failed",upstream_status:r.status,upstream_message:data?.error?.message||"unknown upstream error"});const raw=data?.candidates?.[0]?.content?.parts?.find(p=>typeof p?.text==="string")?.text;if(!raw)return out(502,{ok:false,error:"Gemini returned no structured text"});let parsed;try{parsed=JSON.parse(raw)}catch{return out(502,{ok:false,error:"Gemini returned invalid JSON"})}const validation=validateBundle(parsed);if(!validation.ok)return out(422,{ok:false,error:"Prompt bundle failed local validation",validation});for(const item of parsed.opportunities)if(POLICY.test(`${item.prompt} ${item.negative_prompt}`))return out(422,{ok:false,error:"Prompt bundle failed prohibited-pattern scan"});return out(200,{ok:true,model,validated:true,result:parsed});}catch(e){return out(400,{ok:false,error:e instanceof Error?e.message:"invalid request"})}}
+
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+const DEFAULT_WORKERS_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
+const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
+const POLICY = /\b(?:in the style of|inspired by|influenced by|after the style of|in the tradition of|celebrity|famous person|famous character|government agency|breaking news|news event|actual news)\b/i;
+const INSTRUCTION = `You are a commercial microstock art director and prompt compiler. Analyze the uploaded reference only to understand commercially useful intent. Do not copy, trace, recreate, match, or closely reproduce the reference. Preserve the buyer need while changing creative expression. Return exactly five materially different concepts. Variation must be conceptual, not a crop, flip, recolor, filter, or tiny composition adjustment. Change multiple dimensions such as subject treatment, environment, viewpoint, composition, lighting, color strategy, styling, negative space, narrative, or buyer use case. Write each master prompt in clear professional English for a generic modern text-to-image model. Include subject, state/action, environment, composition, viewpoint, lighting, materials/texture where relevant, color strategy, depth/focus when relevant, commercial use, copy space when useful, and clean-output constraints. Do not name artists, real people, celebrities, fictional characters, brands, trademarks, logos, proprietary products, government agencies, copyrighted works, or actual newsworthy events. Do not ask for exact replicas or reference matching. Avoid embedded text, signatures, watermarks, UI elements, badges, labels, and accidental typography. Do not invent unseen factual details; use generic descriptions when uncertain. Use photographic language only for photo concepts. Negative prompts should target likely failure modes for that concept.`;
+
+function out(status, payload) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { "content-type": "application/json;charset=utf-8", "cache-control": "no-store" },
+  });
+}
+
+function imagePart(value) {
+  if (typeof value !== "string") throw new Error("image is required");
+  const match = value.match(/^data:(image\/(?:jpeg|jpg|png|webp));base64,(.+)$/s);
+  if (!match) throw new Error("image must be a JPEG, PNG, or WebP data URL");
+  const data = match[2].replace(/\s+/g, "");
+  const bytes = Math.floor(data.length * 3 / 4);
+  if (bytes > MAX_IMAGE_BYTES) throw new Error("analysis image exceeds 12 MB");
+  return { mime_type: match[1] === "image/jpg" ? "image/jpeg" : match[1], data };
+}
+
+function requestPrompt(body) {
+  const assetType = String(body?.asset_type || "Any suitable stock type").slice(0, 80);
+  const aspect = String(body?.preferred_aspect || "Choose commercially useful framing").slice(0, 80);
+  const notes = String(body?.notes || "").slice(0, 2000);
+  return `${INSTRUCTION}\nRequested asset type: ${assetType}\nPreferred framing: ${aspect}\nOperator notes: ${notes || "None"}\nReturn only JSON matching this schema: ${JSON.stringify(MICROSTOCK_SCHEMA)}`;
+}
+
+function parseJson(value) {
+  const text = typeof value === "string" ? value : JSON.stringify(value);
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)?.[1] || text;
+  try { return JSON.parse(fenced); } catch { return null; }
+}
+
+async function validateAndReturn(parsed, provider, model) {
+  if (!parsed) return { ok: false, response: out(502, { ok: false, error: `${provider} returned invalid JSON` }) };
+  const validation = validateBundle(parsed);
+  if (!validation.ok) return { ok: false, response: out(422, { ok: false, error: "Prompt bundle failed local validation", validation }) };
+  for (const item of parsed.opportunities) {
+    if (POLICY.test(`${item.prompt} ${item.negative_prompt}`)) {
+      return { ok: false, response: out(422, { ok: false, error: "Prompt bundle failed prohibited-pattern scan" }) };
+    }
+  }
+  return { ok: true, response: out(200, { ok: true, provider, model, validated: true, result: parsed }) };
+}
+
+async function runGemini(env, image, prompt) {
+  const model = String(env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL);
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [{ inline_data: image }, { text: prompt }] }],
+      generationConfig: { temperature: 0.72, maxOutputTokens: 9000, responseMimeType: "application/json", responseSchema: MICROSTOCK_SCHEMA },
+    }),
+  });
+  const data = await response.json().catch(() => null);
+  if (!response.ok) throw new Error(data?.error?.message || `Gemini request failed (${response.status})`);
+  const raw = data?.candidates?.[0]?.content?.parts?.find((part) => typeof part?.text === "string")?.text;
+  return { model, parsed: parseJson(raw) };
+}
+
+async function runWorkersAI(env, image, prompt) {
+  if (!env.AI || typeof env.AI.run !== "function") throw new Error("Workers AI binding is not configured");
+  const model = String(env.WORKERS_AI_MODEL || DEFAULT_WORKERS_MODEL);
+  const response = await env.AI.run(model, {
+    messages: [{ role: "user", content: [
+      { type: "text", text: prompt },
+      { type: "image_url", image_url: { url: `data:${image.mime_type};base64,${image.data}` } },
+    ] }],
+    temperature: 0.35,
+    max_tokens: 7000,
+  });
+  return { model, parsed: parseJson(response?.response || response?.result || response) };
+}
+
+export async function onRequestPost({ request, env }) {
+  try {
+    const body = await request.json();
+    const image = imagePart(body?.image);
+    const prompt = requestPrompt(body);
+    const requestedProvider = String(body?.provider || env.PROMPT_PROVIDER || "auto").toLowerCase();
+    const attempts = requestedProvider === "gemini" ? ["gemini"] : requestedProvider === "workers-ai" ? ["workers-ai"] : ["workers-ai", "gemini"];
+    const failures = [];
+
+    for (const provider of attempts) {
+      if (provider === "gemini" && !env.GEMINI_API_KEY) {
+        failures.push("Gemini key is not configured");
+        continue;
+      }
+      try {
+        const result = provider === "gemini" ? await runGemini(env, image, prompt) : await runWorkersAI(env, image, prompt);
+        const checked = await validateAndReturn(result.parsed, provider, result.model);
+        if (checked.ok) return checked.response;
+        failures.push(`${provider}: ${checked.response.status} validation failure`);
+      } catch (error) {
+        failures.push(`${provider}: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+
+    return out(503, {
+      ok: false,
+      error: "No prompt model is available",
+      detail: "Configure the Cloudflare Pages AI binding for free-first mode, or add GEMINI_API_KEY for Gemini mode.",
+      attempts: failures,
+    });
+  } catch (error) {
+    return out(400, { ok: false, error: error instanceof Error ? error.message : "invalid request" });
+  }
+}
+
+export { imagePart, parseJson, requestPrompt, runWorkersAI };
