@@ -13,14 +13,20 @@ Exactly 5 distinct concepts
         ↓
 Copy-ready master prompt + negative prompt
         ↓
-Manual generation in external APK
+Manual generation in external APK or browser tool
         ↓
 Upload generated image
         ↓
 AI super-resolution lane
+        ↓
+Editable metadata
+        ↓
+Download final asset + metadata
+        ↓
+Human review / ready upload
 ```
 
-This project intentionally does not generate images. The image generator remains an external APK chosen by the operator. It also does not submit to Adobe Stock automatically.
+This project intentionally does not generate images. The image generator remains an external APK or browser tool chosen by the operator. It also does not submit to Adobe Stock automatically. The browser workspace keeps the selected prompt, manually uploaded result, upscale provenance, metadata, and final download state together in one workflow.
 
 ## Prompt contract
 

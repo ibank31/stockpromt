@@ -1,1 +1,87 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="StockPromt Studio turns a reference into five distinct commercial microstock prompts"><title>StockPromt Studio</title><link rel="stylesheet" href="./styles.css"></head><body><main class="shell"><header class="hero"><div><p class="eyebrow">STOCKPROMT STUDIO · V1</p><h1>Reference → 5 commercial prompts</h1><p class="sub">Analyze a reference, preserve market intent, and produce five materially different prompts for manual generation in your external APK.</p></div><div id="status" class="status">READY</div></header><section class="panel"><label id="drop" class="drop"><input id="image" type="file" accept="image/jpeg,image/png,image/webp"><span class="drop-title">Upload reference / screenshot</span><span class="drop-help">JPEG, PNG, WebP · analysis copy is resized locally</span></label><img id="preview" class="preview" alt="Reference preview" hidden><div class="controls"><label>Asset type<select id="assetType"><option>Photo</option><option>Illustration</option><option>Vector concept</option><option>Any suitable stock type</option></select></label><label>Framing<select id="aspect"><option>Square 1:1</option><option>Landscape 4:3</option><option>Landscape 3:2</option><option>Wide 16:9</option><option>Portrait 2:3</option><option>Choose from the reference</option></select></label></div><label>Operator notes<textarea id="notes" rows="3" maxlength="2000" placeholder="Niche, buyer, object emphasis, copy-space need, background preference..."></textarea></label><button id="run" class="primary" disabled>Generate 5 prompts</button><p class="fine">No image generation or marketplace submission occurs here.</p></section><section id="summary" class="summary panel" hidden><div><span class="label">REFERENCE</span><p id="referenceSummary"></p></div><div><span class="label">COMMERCIAL INTENT</span><p id="commercialIntent"></p></div><div><span class="label">POLICY NOTES</span><ul id="policyNotes"></ul></div></section><section id="results" class="results" hidden><div class="results-head"><h2>Five distinct directions</h2><span id="modelBadge" class="badge"></span></div><div id="cards"></div></section></main><script type="module" src="./app.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="StockPromt Studio: reference analysis, commercial prompts, manual generation, upscale, metadata, and final download.">
+  <title>StockPromt Studio · Manual Asset Factory</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">SP</span><div><p class="eyebrow">STOCKPROMT STUDIO · MANUAL FACTORY</p><strong>Prompt-to-market workspace</strong></div></div>
+      <div id="status" class="status">READY</div>
+    </header>
+
+    <section class="intro">
+      <div>
+        <p class="kicker">NO HIDDEN IMAGE GENERATION</p>
+        <h1>Upload. Analyze. Prompt.<br><em>You generate the asset.</em></h1>
+        <p class="sub">A deliberate browser workflow for turning a reference into a commercially differentiated prompt, then bringing your manually generated image back for upscale, metadata, and final download.</p>
+      </div>
+      <div class="contract"><span>OPERATING CONTRACT</span><p>Prompts are generated here. Images are generated manually in your chosen tool. Every final decision remains human-reviewed.</p></div>
+    </section>
+
+    <nav class="stepper" aria-label="Workflow stages">
+      <button class="step active" data-step="reference"><span>01</span><b>Reference</b><small>upload + analyze</small></button>
+      <button class="step" data-step="prompt"><span>02</span><b>Prompt</b><small>choose direction</small></button>
+      <button class="step" data-step="manual"><span>03</span><b>Manual gen</b><small>outside this app</small></button>
+      <button class="step" data-step="finalize"><span>04</span><b>Finalize</b><small>upscale + metadata</small></button>
+      <button class="step" data-step="ready"><span>05</span><b>Ready upload</b><small>download bundle</small></button>
+    </nav>
+
+    <section id="referenceStage" class="stage active-stage">
+      <div class="stage-head"><div><span class="stage-num">01 / REFERENCE</span><h2>Start with visual intelligence</h2><p>Upload a reference or screenshot. The image is used for analysis only; it is never sent to an image generator.</p></div><span class="stage-state">REQUIRED</span></div>
+      <div class="grid-two">
+        <div>
+          <label id="drop" class="drop"><input id="image" type="file" accept="image/jpeg,image/png,image/webp"><span class="drop-icon">＋</span><span class="drop-title">Drop a reference here</span><span class="drop-help">JPEG, PNG, WebP · resized locally before analysis</span></label>
+          <img id="preview" class="preview" alt="Reference preview" hidden>
+        </div>
+        <div class="form-stack">
+          <label>Asset type<select id="assetType"><option>Photo</option><option>Illustration</option><option>Vector concept</option><option>Any suitable stock type</option></select></label>
+          <label>Preferred framing<select id="aspect"><option>Choose commercially useful framing</option><option>Square 1:1</option><option>Landscape 4:3</option><option>Landscape 3:2</option><option>Wide 16:9</option><option>Portrait 2:3</option></select></label>
+          <label>Operator notes<textarea id="notes" rows="5" maxlength="2000" placeholder="Buyer, niche, copy-space need, materials, mood, or elements to avoid..."></textarea></label>
+          <button id="run" class="primary" disabled>Analyze reference <span>→</span></button>
+        </div>
+      </div>
+      <p class="fine">The output is exactly five distinct commercial directions. No image generation or marketplace submission occurs at this stage.</p>
+    </section>
+
+    <section id="promptStage" class="stage" hidden>
+      <div class="stage-head"><div><span class="stage-num">02 / PROMPT</span><h2>Select one production direction</h2><p>Each card is a materially different concept, not a crop, recolor, flip, or near-duplicate.</p></div><span id="modelBadge" class="stage-state">5 OPTIONS</span></div>
+      <div id="summary" class="summary-grid"><div><span class="label">REFERENCE INTELLIGENCE</span><p id="referenceSummary">—</p></div><div><span class="label">COMMERCIAL INTENT</span><p id="commercialIntent">—</p></div><div class="wide"><span class="label">POLICY NOTES</span><ul id="policyNotes"></ul></div></div>
+      <div id="cards" class="cards"></div>
+      <div class="selection-bar"><span id="selectionText">Choose a direction to unlock manual generation.</span><button id="continueManual" class="primary small" disabled>Use selected prompt <span>→</span></button></div>
+    </section>
+
+    <section id="manualStage" class="stage" hidden>
+      <div class="stage-head"><div><span class="stage-num">03 / MANUAL GENERATION</span><h2>Generate outside StockPromt</h2><p>Copy the selected prompt into your preferred image tool. When the image is ready, upload it here for finalization.</p></div><span class="stage-state manual-state">HUMAN ACTION</span></div>
+      <div class="manual-grid">
+        <div class="manual-callout"><span class="manual-icon">↗</span><h3>Generation is intentionally manual</h3><p>Use the prompt, negative prompt, aspect ratio, and any seed or model controls in your external generator. StockPromt does not submit or hide a generation request.</p><div class="manual-check"><span>✓</span>Prompt copied or ready to copy</div><div class="manual-check"><span>✓</span>Visual result reviewed by you</div></div>
+        <div class="selected-prompt"><div class="box-head"><span>SELECTED MASTER PROMPT</span><button id="copyMaster" class="ghost">COPY</button></div><pre id="selectedMaster">—</pre><div class="box-head secondary-head"><span>NEGATIVE / FAILURE AVOIDANCE</span><button id="copyNegative" class="ghost">COPY</button></div><pre id="selectedNegative">—</pre><div id="selectedMeta" class="meta"></div></div>
+      </div>
+      <div class="return-panel"><div><span class="stage-num">RETURN WITH YOUR IMAGE</span><h3>Upload the manually generated result</h3><p>PNG, JPEG, or WebP · maximum 20 MB. This image becomes the source for the optional AI upscale stage.</p></div><label id="generatedDrop" class="upload-button"><input id="generatedImage" type="file" accept="image/jpeg,image/png,image/webp"><span>＋ Upload generated image</span></label></div>
+      <div id="generatedPreviewWrap" class="generated-preview" hidden><img id="generatedPreview" alt="Generated image preview"><div><span class="label">UPLOADED SOURCE</span><p id="generatedInfo"></p><button id="continueFinalize" class="primary small">Continue to finalization <span>→</span></button></div></div>
+    </section>
+
+    <section id="finalizeStage" class="stage" hidden>
+      <div class="stage-head"><div><span class="stage-num">04 / FINALIZE</span><h2>Upscale, inspect, and prepare metadata</h2><p>Run the configured super-resolution provider, then review the generated metadata before downloading the final asset.</p></div><span id="finalState" class="stage-state">WAITING</span></div>
+      <div class="final-grid">
+        <div class="final-source"><img id="finalPreview" alt="Final source preview"><div class="source-caption"><span class="label">SOURCE IMAGE</span><p id="finalSourceInfo">—</p></div></div>
+        <div class="upscale-panel"><span class="label">AI SUPER-RESOLUTION</span><h3>Make a final master</h3><p>Provider and model identity will be shown. A plain resize must never be labeled as AI upscale.</p><button id="runUpscale" class="primary">Run AI upscale <span>→</span></button><p id="upscaleMessage" class="fine">Ready when you are.</p><div id="upscaleResult" class="upscale-result" hidden><div><span class="label">PROVIDER</span><strong id="provider">—</strong></div><div><span class="label">MODEL</span><strong id="model">—</strong></div><div><span class="label">OPERATION</span><strong id="operation">AI SUPER-RESOLUTION</strong></div><div><span class="label">DIMENSIONS</span><strong id="dimensions">—</strong></div></div></div>
+      </div>
+      <div class="metadata-panel"><div class="stage-head compact"><div><span class="stage-num">METADATA</span><h3>Adobe-ready information</h3></div><span class="stage-state">EDITABLE</span></div><div class="metadata-form"><label>Title<input id="metaTitle" maxlength="200"></label><label>Category<select id="metaCategory"><option>Objects</option><option>Technology</option><option>Nature</option><option>People</option><option>Lifestyle</option><option>Backgrounds</option><option>Food</option></select></label><label class="wide-field">Description<textarea id="metaDescription" rows="3" maxlength="500"></textarea></label><label class="wide-field">Keywords <span class="field-help">comma separated, review before submission</span><textarea id="metaKeywords" rows="3" maxlength="1000"></textarea></label></div></div>
+      <button id="markReady" class="primary ready-button" disabled>Mark ready for upload <span>→</span></button>
+    </section>
+
+    <section id="readyStage" class="stage" hidden>
+      <div class="ready-hero"><div class="ready-check">✓</div><span class="stage-num">05 / READY UPLOAD</span><h2>Human review checkpoint reached</h2><p>Your final asset, metadata, and provenance are ready for download. Review the image and marketplace policy one last time before submission.</p></div>
+      <div class="download-grid"><div class="download-card"><span class="label">FINAL ASSET</span><h3 id="readyAssetName">Final master</h3><p id="readyAssetInfo">—</p><a id="downloadAsset" class="primary download-link" download>Download final asset <span>↓</span></a></div><div class="download-card"><span class="label">METADATA PACKAGE</span><h3>Adobe metadata JSON</h3><p>Title, description, keywords, category, and provenance.</p><button id="downloadMetadata" class="secondary">Download metadata <span>↓</span></button></div></div>
+      <div class="review-list"><span class="label">FINAL REVIEW CHECKLIST</span><div class="review-row"><span>Technical image file and dimensions inspected</span><b>REVIEW</b></div><div class="review-row"><span>No logos, watermarks, UI, or unintended text</span><b>REVIEW</b></div><div class="review-row"><span>Similarity and IP concerns considered</span><b>REVIEW</b></div><div class="review-row"><span>Metadata is accurate and human-approved</span><b>REVIEW</b></div></div>
+      <button id="startOver" class="text-button">Start another asset</button>
+    </section>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
