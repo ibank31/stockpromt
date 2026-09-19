@@ -39,7 +39,7 @@
           <img id="preview" class="preview" alt="Reference preview" hidden>
         </div>
         <div class="form-stack">
-          <label>Asset type<select id="assetType"><option>Photo</option><option>Illustration</option><option>Vector concept</option><option>Any suitable stock type</option></select></label>
+          <label>Output format<select id="outputFormat"><option value="JPEG">JPEG</option><option value="PNG">PNG</option></select></label>
           <label>Preferred framing <span class="field-help">auto-selects when left broad</span><select id="aspect"><option>Choose commercially useful framing</option><option>Square 1:1</option><option>Landscape 4:3</option><option>Landscape 3:2</option><option>Wide 16:9</option><option>Portrait 2:3</option></select></label>
           <label>Prompt model<select id="promptProvider"><option value="auto">Auto · free-first</option><option value="workers-ai">Workers AI · free-first</option><option value="gemini">Gemini · optional key</option></select></label>
           <label>Operator notes <span class="field-help">optional · smart analysis fills the gaps</span><textarea id="notes" rows="5" maxlength="2000" placeholder="Leave blank for automatic buyer, niche, composition, and policy analysis. Add notes only for a specific preference..."></textarea></label>
@@ -62,7 +62,7 @@
         <div class="manual-callout"><span class="manual-icon">↗</span><h3>Generation is intentionally manual</h3><p>Use the prompt, negative prompt, aspect ratio, and any seed or model controls in your external generator. StockPromt does not submit or hide a generation request.</p><div class="manual-check"><span>✓</span>Prompt copied or ready to copy</div><div class="manual-check"><span>✓</span>Visual result reviewed by you</div></div>
         <div class="selected-prompt"><div class="box-head"><span>SELECTED MASTER PROMPT</span><button id="copyMaster" class="ghost">COPY</button></div><pre id="selectedMaster">—</pre><div class="box-head secondary-head"><span>NEGATIVE / FAILURE AVOIDANCE</span><button id="copyNegative" class="ghost">COPY</button></div><pre id="selectedNegative">—</pre><div id="selectedMeta" class="meta"></div></div>
       </div>
-      <div class="return-panel"><div><span class="stage-num">RETURN WITH YOUR IMAGE</span><h3>Upload the manually generated result</h3><p>PNG, JPEG, or WebP · maximum 20 MB. This image becomes the source for the optional AI upscale stage.</p></div><label id="generatedDrop" class="upload-button"><input id="generatedImage" type="file" accept="image/jpeg,image/png,image/webp"><span>＋ Upload generated image</span></label></div>
+      <div class="return-panel"><div><span class="stage-num">RETURN WITH YOUR IMAGE</span><h3>Upload the manually generated result</h3><p>JPEG or PNG · maximum 20 MB. This image becomes the source for the optional AI upscale stage.</p></div><label id="generatedDrop" class="upload-button"><input id="generatedImage" type="file" accept="image/jpeg,image/png"><span>＋ Upload generated image</span></label></div>
       <div id="generatedPreviewWrap" class="generated-preview" hidden><img id="generatedPreview" alt="Generated image preview"><div><span class="label">UPLOADED SOURCE</span><p id="generatedInfo"></p><button id="continueFinalize" class="primary small">Continue to finalization <span>→</span></button></div></div>
     </section>
 

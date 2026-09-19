@@ -24,10 +24,10 @@ function imagePart(value) {
 }
 
 function requestPrompt(body) {
-  const assetType = String(body?.asset_type || "Any suitable stock type").slice(0, 80);
+  const outputFormat = String(body?.output_format || "JPEG").toUpperCase() === "PNG" ? "PNG" : "JPEG";
   const aspect = String(body?.preferred_aspect || "Choose commercially useful framing").slice(0, 80);
   const notes = String(body?.notes || "").slice(0, 2000);
-  return `${INSTRUCTION}\nRequested asset type: ${assetType}\nPreferred framing: ${aspect}\nOperator notes: ${notes || "None"}\nReturn only JSON matching this schema: ${JSON.stringify(MICROSTOCK_SCHEMA)}`;
+  return `${INSTRUCTION}\nRequested output format: ${outputFormat}. Keep the concept suitable for this file format; do not add transparency unless PNG is selected, and do not rely on transparency when JPEG is selected.\nPreferred framing: ${aspect}\nOperator notes: ${notes || "None"}\nReturn only JSON matching this schema: ${JSON.stringify(MICROSTOCK_SCHEMA)}`;
 }
 
 function parseJson(value) {
