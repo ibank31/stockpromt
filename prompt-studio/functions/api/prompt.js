@@ -16,7 +16,7 @@ ANALYSIS REQUIREMENTS
 - The operator's explicit prompt and negative constraints take priority over incidental objects in the reference. Do not invent gold 3D objects, glowing particles, financial symbols, bars, arrows, clouds, or other motifs unless the requested concept calls for them.
 - Return exactly ONE strongest production-ready concept, not multiple alternatives. Include a detailed master prompt and a comprehensive comma-separated negative prompt.
 - The master prompt must include subject, action/state, environment, composition, viewpoint, medium/rendering method, line and shading behavior, color strategy, depth/focus only when relevant, commercial use, copy space, aspect ratio, output format, and clean-output constraints.
-- The final prompt must include explicit `STYLE TRANSFER CONSTRAINTS` and `SUBJECT SEPARATION` sections. The requested subject must remain dominant.
+- The final prompt must include explicit STYLE TRANSFER CONSTRAINTS and SUBJECT SEPARATION sections. The requested subject must remain dominant.
 - Do not name artists, real people, celebrities, fictional characters, brands, trademarks, logos, proprietary products, government agencies, copyrighted works, or actual newsworthy events. Do not ask for reference matching or an exact replica.
 - Avoid embedded text, signatures, watermarks, UI elements, badges, labels, prices, buttons, and accidental typography. Do not invent unseen factual details.
 - The negative prompt must cover reference-copy risk, screenshot contamination, unwanted text/UI/branding, quality defects, composition failures, anatomy/object deformation when relevant, and format-specific issues.
