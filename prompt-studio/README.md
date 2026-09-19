@@ -36,7 +36,7 @@ This project intentionally does not generate images. The image generator remains
 
 Every concept must contain a concrete subject treatment, composition, viewpoint, environment, lighting, materials/texture where relevant, color strategy, buyer use case, copy-space guidance, aspect ratio guidance, and practical failure-prevention terms.
 
-The compiler must return exactly five materially different concepts. It must not reduce variation to crop/flip/recolor/filter tweaks.
+The compiler returns exactly one strongest production-ready concept with a detailed master prompt and comprehensive negative prompt. It must materially differentiate the new asset from the reference rather than copy, trace, crop, recolor, flip, or filter it.
 
 ## Free-first provider architecture
 

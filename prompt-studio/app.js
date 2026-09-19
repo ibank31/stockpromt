@@ -106,7 +106,7 @@ async function analyze() {
     $('#referenceSummary').textContent = payload.result.reference_summary;
     $('#commercialIntent').textContent = payload.result.commercial_intent;
     $('#policyNotes').replaceChildren(...payload.result.policy_notes.map((note) => { const li = document.createElement('li'); li.textContent = note; return li; }));
-    $('#modelBadge').textContent = `${payload.result.opportunities.length} OPTIONS · ${payload.provider || 'model'} · ${payload.model || 'auto'}`;
+    $('#modelBadge').textContent = `FINAL PROMPT · ${payload.provider || 'model'} · ${payload.model || 'auto'}`;
     $('#cards').replaceChildren(...payload.result.opportunities.map(makeCard));
     setStatus('PROMPTS READY'); go('prompt');
   } catch (error) { setStatus('ERROR'); alert(error instanceof Error ? error.message : String(error)); }
